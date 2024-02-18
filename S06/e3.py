@@ -27,23 +27,26 @@ class Seq:
     def len(self):
         return len(self.strbases)
 
+
 def generate_seqs(pattern, number):
     string = ""
     i = 0
-    list = []
+    list1 = []
     while i < number:
         string += pattern
         i += 1
-        list.append(Seq(string))
-    return list
+        list1.append(Seq(string))
+    return list1
 
-def print_seqs(list):
-    for e in list:
-        index = list.index(e)
+
+def print_seqs(list1):
+    for e in list1:
+        index = list1.index(e)
         part1 = str(index) + ":"
         length = len(e.strbases)
         part2 = "(Length:" + str(length) + ")"
         print("Sequence", part1, part2, e)
+
 
 seq_list1 = generate_seqs("A", 3)
 seq_list2 = generate_seqs("AC", 5)

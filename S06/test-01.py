@@ -11,7 +11,6 @@ print(f"    T: {seq_count_base(seq1, 'T')}")
 print(f"    C: {seq_count_base(seq1, 'C')}")
 print(f"    G: {seq_count_base(seq1, 'G')}")
 
-from Seq0 import *
 
 # -- This sequence is not valid, as it has characters
 # -- different than the 4 bases: A,T,C,G
@@ -28,6 +27,7 @@ print(f"    G: {seq_count_base(seq1, 'G')}")
 
 seq1 = "ATTXMMNXCCCGGGG"
 
+
 # -- Check that the sequence is valid
 def seq_check(seq):
     condition = True
@@ -36,5 +36,6 @@ def seq_check(seq):
         if not(e in correct_letters):
             condition = False
     return condition
+
+
 print(seq_check(seq1))
-...
