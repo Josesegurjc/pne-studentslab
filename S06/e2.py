@@ -27,7 +27,6 @@ class Seq:
     def len(self):
         return len(self.strbases)
 
-
 def print_seqs(list1):
     for e in list1:
         index = list1.index(e)
