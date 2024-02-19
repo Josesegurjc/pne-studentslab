@@ -15,6 +15,6 @@ def print_seqs(list_of_seq):
         print("Comp:", complementary)
 
 s1 = Seq()
-s1 = s1.seq_read_fasta("U5")
+s1 = s1.seq_read_fasta("Sequences/U5")
 list1 = [s1]
 print_seqs(list1)

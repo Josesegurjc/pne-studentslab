@@ -11,7 +11,7 @@ s3 = Seq("Invalid sequence")
 
 def print_seqs(list1):
     for e in list1:
-        index = list1.index(e)
+        index = list1.index(e) + 1
         part1 = str(index) + ":"
         length = e.len(e.strbases)
         part2 = "(Length:" + str(length) + ")"

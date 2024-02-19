@@ -19,11 +19,11 @@ def print_seqs(list_of_seq):
         part2 = "(Length:" + str(length) + ")"
         print("Sequence", part1, part2, e)
         dict1 = e.seq_count(e.strbases)
-        print(dict1)
+        print("  Bases:", dict1)
         reverse = e.seq_reverse()
-        print("Rev:", reverse)
+        print("  Rev:", reverse)
         complementary = e.seq_complement()
-        print("Comp:", complementary)
+        print("  Comp:", complementary)
 
 
 list1 = [s1, s2, s3]
