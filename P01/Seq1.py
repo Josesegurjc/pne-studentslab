@@ -68,7 +68,7 @@ class Seq:
         return dict1
 
     def seq_reverse(self, strbases=None):
-        strbases = self.strbases
+        self.strbases = strbases
         if strbases is None:
             reverse_string = "NULL"
         else:
@@ -86,8 +86,8 @@ class Seq:
                 reverse_string += strbases[0]
         return reverse_string
 
-    def seq_complement(self, strbases = None):
-        strbases = self.strbases
+    def seq_complement(self, strbases=None):
+        self.strbases = strbases
         if strbases is None:
             complement = "NULL"
         else:
@@ -143,12 +143,3 @@ class Gene(Seq):
     def __str__(self):
         return self.name + "-" + self.strbases
     pass
-
-
-def print_seqs(list1):
-    for e in list1:
-        index = list1.index(e)
-        part1 = str(index) + ":"
-        length = len(e.strbases)
-        part2 = "(Length:" + str(length) + ")"
-        print("Sequence", part1, part2, e)
