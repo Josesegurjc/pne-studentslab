@@ -117,7 +117,8 @@ class Seq:
         file_info = Path(filename).read_text()
         file_info = file_info[file_info.index("\n"):]
         file_info = file_info.replace("\n", "")
-        return Seq(file_info)
+        self.strbases = file_info
+        return self
 
     def most_common_base(self, strbases):
         self.strbases = strbases
