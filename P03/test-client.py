@@ -12,7 +12,8 @@ for n in range(0, 5):
     print(header, c.talk(message))
 sequence = c.talk("GET 0")
 print("* Testing INFO...")
-print("HAY QUE ARREGLLAR ESTO")
+message = "INFO " + sequence
+print(c.talk(message))
 print("* Testing COMP...")
 print("COMP", sequence)
 message = "COMP " + sequence

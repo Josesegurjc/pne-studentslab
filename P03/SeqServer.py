@@ -64,11 +64,20 @@ while True:
         elif msg.startswith("INFO"):
             print("INFO")
             sequence = Seq(msg[msg.find(" ") + 1:])
-            list_of_info = []
-            list_of_info.append(str(sequence))
-            list_of_info.append(sequence.len(sequence.strbases))
-            list_of_info.append(sequence.seq_count(sequence.strbases))
-            cs.send(str(list_of_info).encode())
+            length = sequence.len(sequence.strbases)
+            sequence1 = "Sequence: " + str(sequence)
+            length1 = "Total length: " + str(length)
+            bases_count = sequence.seq_count(sequence.strbases)
+            a_count = "A: " + str(bases_count["A"]) + " (" + str((bases_count["A"] / length) * 100) + "%)"
+            c_count = "C: " + str(bases_count["C"]) + " (" + str((bases_count["C"] / length) * 100) + "%)"
+            g_count = "G: " + str(bases_count["G"]) + " (" + str((bases_count["G"] / length) * 100) + "%)"
+            t_count = "T: " + str(bases_count["T"]) + " (" + str((bases_count["T"] / length) * 100) + "%)"
+            list1 = [sequence1, length1, a_count, c_count, g_count, t_count]
+            for e in list1:
+                print(e)
+                msg = e + "\n"
+                cs.send(msg.encode())
+
         elif msg.startswith("COMP"):
             print("COMP")
             sequence = Seq(msg[msg.find(" ") + 1:])
