@@ -5,7 +5,7 @@ from pathlib import Path
 
 # -- Server network parameters
 IP = "127.0.0.1"
-PORT = 8080
+PORT = 8084
 
 
 def process_client(s):
@@ -20,6 +20,7 @@ def process_client(s):
 
     # -- The request line is the first
     req_line = lines[0]
+    request = req_line[req_line.find("/"):req_line.find("H") - 1]
 
     print("Request line: ", end="")
     termcolor.cprint(req_line, "green")
@@ -39,13 +40,14 @@ def process_client(s):
     header = "Content-Type: text/html\n"
 
     # -- Build the message by joining together all the parts
-    if req_line.find("/info/A") != -1:
+    if request == "/info/A":
         header += f"Content-Length: {len(infoA)}\n"
         response_msg1 = status_line + header + "\n" + infoA
         cs.send(response_msg1.encode())
     else:
         response_msg1 = status_line + header + "\n"
         cs.send(response_msg1.encode())
+
 
 
 

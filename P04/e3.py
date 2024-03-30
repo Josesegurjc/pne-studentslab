@@ -5,7 +5,7 @@ from pathlib import Path
 
 # -- Server network parameters
 IP = "127.0.0.1"
-PORT = 8080
+PORT = 8084
 
 
 def process_client(s):
@@ -20,6 +20,7 @@ def process_client(s):
 
     # -- The request line is the first
     req_line = lines[0]
+    request = req_line[req_line.find("/"):req_line.find("H") - 1]
 
     print("Request line: ", end="")
     termcolor.cprint(req_line, "green")
@@ -40,11 +41,11 @@ def process_client(s):
     header = "Content-Type: text/html\n"
 
     # -- Build the message by joining together all the parts
-    if req_line.find("/info/A") != -1:
+    if request == "/info/A":
         header += f"Content-Length: {len(infoA)}\n"
         response_msg1 = status_line + header + "\n" + infoA
         cs.send(response_msg1.encode())
-    elif req_line.find("/info/C") != -1:
+    elif request == "/info/C":
         header += f"Content-Length: {len(infoC)}\n"
         response_msg1 = status_line + header + "\n" + infoC
         cs.send(response_msg1.encode())
@@ -52,6 +53,42 @@ def process_client(s):
         response_msg1 = status_line + header + "\n"
         cs.send(response_msg1.encode())
 
+
+
+
+
+# -------------- MAIN PROGRAM
+# ------ Configure the server
+# -- Listening socket
+ls = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# -- Optional: This is for avoiding the problem of Port already in use
+ls.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+# -- Setup up the socket's IP and PORT
+ls.bind((IP, PORT))
+
+# -- Become a listening socket
+ls.listen()
+
+print("Server configured!")
+
+# --- MAIN LOOP
+while True:
+    print("Waiting for clients....")
+    try:
+        (cs, client_ip_port) = ls.accept()
+    except KeyboardInterrupt:
+        print("Server stopped!")
+        ls.close()
+        exit()
+    else:
+
+        # Service the client
+        process_client(cs)
+
+        # -- Close the socket
+        cs.close()
 
 
 
