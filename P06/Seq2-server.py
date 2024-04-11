@@ -4,6 +4,7 @@ import termcolor
 from pathlib import Path
 import jinja2 as j
 from urllib.parse import parse_qs, urlparse
+from Seq0 import seq_reverse, seq_complement, seq_len, seq_count
 
 # Define the Server's port
 PORT = 8080
@@ -32,19 +33,59 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             contents = j.Template(contents)
             return contents
 
+        def get_info(sequence):
+            text = "Sequence: " + sequence + "\n" + "Total length: " + str(seq_len(sequence)) + "\n"
+            dict1 = seq_count(sequence)
+            for e in dict1:
+                index = e + ": "
+                percentage = (dict1[e] / seq_len(sequence)) * 100
+                percentage = "(" + str(round(percentage, 2)) + "%)"
+                text += index + str(dict1[e]) + percentage + "\n"
+            print(text)
+            return text
+
+
+
+
+
         url_path = urlparse(self.path)
         path = url_path.path  # we get it from here
         arguments = parse_qs(url_path.query)
 
+        list_of_sequences = ["GTCAGTCA", "ACGTGCTAG", "GTCGTACAAGCT", "CATGCTAGCTAGC", "ACCGTAGCAAGTC"]
+        keys = ["U5","ADA","FRAT1","RNU6_269P","FXN"]
+        values = []
+        for e in keys:
+            filename = "Sequences/" + e + ".txt"
+            gene = Path(filename).read_text()
+            gene = gene[gene.find("\n"):]
+            values.append(gene)
+        dict1 = dict(zip(keys,values))
+        print(arguments)
+        list_of_operations = ["Info", "Comp", "Rev"]
 
-        if self.path == "/":
-            contents = Path("html/form-2.html").read_text()
-        elif self.path[1:5] == "echo":
-            text = arguments["msg"][0]
-            if len(arguments) > 1:
-                if arguments["chk"][0] == "on":
-                    text = text.upper()
-            contents = read_html_file("form-e2.html").render(context={"todisplay": text})
+        if path == "/":
+            contents = Path("html/index.html").read_text()
+        elif path == "/ping":
+            contents = Path("html/ping.html").read_text()
+        elif path == "/get":
+            number = arguments["s"][0]
+            text = list_of_sequences[int(number)]
+            contents = read_html_file("get.html").render(context={"todisplay": text})
+        elif path == "/gene":
+            key = arguments["g"][0]
+            text = dict1[key]
+            contents = read_html_file("gene.html").render(context={"todisplay": text})
+        elif path == "/operation":
+            key = arguments["op"][0]
+            if key == "Info":
+                text = get_info(arguments["operation"][0])
+            elif key == "Comp":
+                text = seq_complement(arguments["operation"][0])
+            else:
+                text = seq_reverse(arguments["operation"][0], None)
+            contents = read_html_file("operation.html").render(context={"todisplay": text})
+
         else:
             contents = Path("html/error.html").read_text()
 
@@ -53,7 +94,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
         # Generating the response message
         self.send_response(200)  # -- Status line: OK!
-
 
         # Define the content-type header:
         self.send_header('Content-Type', 'text/html')
