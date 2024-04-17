@@ -41,7 +41,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 percentage = (dict1[e] / seq_len(sequence)) * 100
                 percentage = "(" + str(round(percentage, 2)) + "%)"
                 text += index + str(dict1[e]) + percentage + "\n"
-            print(text)
             return text
 
 
@@ -61,7 +60,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             gene = gene[gene.find("\n"):]
             values.append(gene)
         dict1 = dict(zip(keys,values))
-        print(arguments)
         list_of_operations = ["Info", "Comp", "Rev"]
 
         if path == "/":
@@ -79,12 +77,20 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         elif path == "/operation":
             key = arguments["op"][0]
             if key == "Info":
-                text = get_info(arguments["operation"][0])
+                text = arguments["operation"][0]
+                text2 = "Info"
+                text3 = get_info(arguments["operation"][0])
             elif key == "Comp":
-                text = seq_complement(arguments["operation"][0])
+                text = arguments["operation"][0]
+                text2 = "Comp"
+                text3 = seq_complement(arguments["operation"][0])
             else:
-                text = seq_reverse(arguments["operation"][0], None)
-            contents = read_html_file("operation.html").render(context={"todisplay": text})
+                text = arguments["operation"][0]
+                text2 = "Rev"
+                text3 = seq_reverse(arguments["operation"][0], None)
+            contents = read_html_file("operation.html").render(context={"todisplay": text, "todisplay2": text2, "todisplay3": text3})
+
+
 
         else:
             contents = Path("html/error.html").read_text()
