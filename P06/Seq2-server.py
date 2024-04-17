@@ -34,13 +34,13 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             return contents
 
         def get_info(sequence):
-            text = "Sequence: " + sequence + "\n" + "Total length: " + str(seq_len(sequence)) + "\n"
+            text = "Sequence: " + sequence + "<p>" + "Total length: " + str(seq_len(sequence)) + "<p>"
             dict1 = seq_count(sequence)
             for e in dict1:
                 index = e + ": "
                 percentage = (dict1[e] / seq_len(sequence)) * 100
                 percentage = "(" + str(round(percentage, 2)) + "%)"
-                text += index + str(dict1[e]) + percentage + "\n"
+                text += "<p>" + index + str(dict1[e]) + percentage + "<p>"
             return text
 
 
@@ -60,7 +60,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             gene = gene[gene.find("\n"):]
             values.append(gene)
         dict1 = dict(zip(keys,values))
-        list_of_operations = ["Info", "Comp", "Rev"]
+
 
         if path == "/":
             contents = Path("html/index.html").read_text()
