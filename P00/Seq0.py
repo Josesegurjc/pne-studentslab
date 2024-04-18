@@ -4,7 +4,6 @@ def seq_ping():
 
 def seq_read_fasta(filename):
     from pathlib import Path
-    filename = filename + ".txt"
     file_info = Path(filename).read_text()
     file_info = file_info[file_info.index("\n"):]
     file_info = file_info.replace("\n", "")

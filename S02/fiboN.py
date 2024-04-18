@@ -6,8 +6,7 @@ def fibon(n):
         n3 = n1 + n2
         n1 = n2
         n2 = n3
-    string = str(n) + "th"
-    print(string, "Fibonacci term:", n3)
+    print(str(n) + "th", "Fibonacci term:", n3)
 
 
 fibon(5)

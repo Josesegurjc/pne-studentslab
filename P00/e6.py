@@ -1,6 +1,6 @@
 from Seq0 import seq_reverse
 from Seq0 import seq_read_fasta
-filename =  "Sequences/U5"
+filename = "Sequences/U5.txt"
 seq = seq_read_fasta(filename)[:20]
 reverse = seq_reverse(seq, 20)
 print("Gene U5")

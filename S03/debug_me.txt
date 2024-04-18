@@ -8,7 +8,7 @@ def g(a, b):
 def f(a, b, c, d):
     t0 = a + b - g(a, 0)
     t1 = g(c, d)
-    t3 = 2 * (t0 / t1) #If t1 = 0 there is an error (Result 2 gives this problem)
+    t3 = 2 * (t0 / t1) #If t1 = 0 an error occurs (Result 2 gives this problem)
     return t0 + 2*t1 + t3*t3
 
 
