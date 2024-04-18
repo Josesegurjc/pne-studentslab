@@ -2,7 +2,7 @@ import http.server
 import socketserver
 
 # Define the Server's port
-PORT = 8087
+PORT = 8080
 
 
 # -- This is for preventing the error: "Port already in use"

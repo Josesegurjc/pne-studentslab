@@ -42,25 +42,19 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 percentage = "(" + str(round(percentage, 2)) + "%)"
                 text += "<p>" + index + str(dict1[e]) + percentage + "<p>"
             return text
-
-
-
-
-
         url_path = urlparse(self.path)
         path = url_path.path  # we get it from here
         arguments = parse_qs(url_path.query)
 
         list_of_sequences = ["GTCAGTCA", "ACGTGCTAG", "GTCGTACAAGCT", "CATGCTAGCTAGC", "ACCGTAGCAAGTC"]
-        keys = ["U5","ADA","FRAT1","RNU6_269P","FXN"]
+        keys = ["U5", "ADA", "FRAT1", "RNU6_269P", "FXN"]
         values = []
         for e in keys:
             filename = "Sequences/" + e + ".txt"
             gene = Path(filename).read_text()
             gene = gene[gene.find("\n"):]
             values.append(gene)
-        dict1 = dict(zip(keys,values))
-
+        dict1 = dict(zip(keys, values))
 
         if path == "/":
             contents = Path("html/index.html").read_text()
@@ -89,21 +83,14 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 text2 = "Rev"
                 text3 = seq_reverse(arguments["operation"][0], None)
             contents = read_html_file("operation.html").render(context={"todisplay": text, "todisplay2": text2, "todisplay3": text3})
-
-
-
         else:
             contents = Path("html/error.html").read_text()
-
-
-
-
         # Generating the response message
         self.send_response(200)  # -- Status line: OK!
 
         # Define the content-type header:
         self.send_header('Content-Type', 'text/html')
-        self.send_header('Content-Length', len(str.encode(contents)))
+        self.send_header('Content-Length', str(len(str.encode(contents))))
 
         # The header is finished
         self.end_headers()
@@ -112,8 +99,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(str.encode(contents))
 
         return
-
-
 
 
 # ------------------------

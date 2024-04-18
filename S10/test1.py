@@ -1,5 +1,5 @@
 from Client0 import Client
-PORT = 8081
+PORT = 8080
 IP = "127.0.0.1"
 c1 = Client(IP, PORT)
 string1 = c1.talk("Test1...")

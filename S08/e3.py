@@ -1,7 +1,7 @@
 import socket
 
 # SERVER IP, PORT
-PORT = 8081
+PORT = 8080
 IP = "192.168.100.113"
 # depends on the computer the server is running
 
