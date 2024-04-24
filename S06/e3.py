@@ -42,10 +42,9 @@ def generate_seqs(pattern, number):
 def print_seqs(list1):
     for e in list1:
         index = list1.index(e)
-        part1 = str(index) + ":"
         length = len(e.strbases)
-        part2 = "(Length:" + str(length) + ")"
-        print("Sequence", part1, part2, e)
+        print("Sequence " + str(index) + ":", "(Length: " + str(length) + ")", e)
+
 
 
 seq_list1 = generate_seqs("A", 3)

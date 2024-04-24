@@ -1,12 +1,9 @@
 def fibon(n):
-    n1 = 0
-    n2 = 1
-    n3 = 0
+    list_of_numbers = [0, 1]
     for i in range(0, n - 1):
-        n3 = n1 + n2
-        n1 = n2
-        n2 = n3
-    print(str(n) + "th", "Fibonacci term:", n3)
+        n3 = list_of_numbers[i] + list_of_numbers[i + 1]
+        list_of_numbers.append(n3)
+    print(str(n) + "th", "Fibonacci term:", list_of_numbers[-1])
 
 
 fibon(5)

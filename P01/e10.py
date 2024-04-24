@@ -9,3 +9,4 @@ for e in list_of_names:
     base = s.most_common_base(s.strbases)
     print("Gene", list_of_names[i], ":", "Most frequent Base:", base)
     i += 1
+    

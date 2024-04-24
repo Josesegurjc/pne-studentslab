@@ -26,9 +26,11 @@ def seq_count_base(seq, base):
 def seq_count(seq):
     keys = ["A", "T", "C", "G"]
     values = []
-    from Seq0 import seq_count_base
     for e in keys:
-        count = seq_count_base(seq, e)
+        count = 0
+        for c in seq:
+            if c == e:
+                count += 1
         values.append(count)
     dict1 = dict(zip(keys, values))
     return dict1
@@ -46,15 +48,9 @@ def seq_reverse(seq, n):
 
 def seq_complement(seq):
     complement = ""
+    dict1 = dict(zip(["A", "T", "C", "G"], ["T", "A", "G", "C"]))
     for e in seq:
-        if e == "A":
-            complement += "T"
-        if e == "T":
-            complement += "A"
-        if e == "C":
-            complement += "G"
-        if e == "G":
-            complement += "C"
+        complement += dict1[e]
     return complement
 
 

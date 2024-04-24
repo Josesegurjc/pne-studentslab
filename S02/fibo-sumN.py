@@ -1,13 +1,12 @@
 def fibosum(n):
-    n1 = 0
-    n2 = 1
-    sum = 1
+    list_of_numbers = [0, 1]
+    count = 0
     for i in range(0, n - 1):
-        n3 = n1 + n2
-        n1 = n2
-        n2 = n3
-        sum += n3
-    print("Sum of the First", n, "terms of the Fibonacci series:", sum)
+        n3 = list_of_numbers[i] + list_of_numbers[i + 1]
+        list_of_numbers.append(n3)
+    for e in list_of_numbers:
+        count += e
+    print("Sum of the First", n, "terms of the Fibonacci series:", count)
 
 
 fibosum(5)

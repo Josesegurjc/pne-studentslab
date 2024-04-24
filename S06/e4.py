@@ -43,10 +43,8 @@ def print_seqs(list1, color):
     import termcolor
     for e in list1:
         index = list1.index(e)
-        part1 = str(index) + ":"
         length = len(e.strbases)
-        part2 = " (Length:" + str(length) + ") "
-        string = "Sequence " + part1 + part2 + e.strbases
+        string = "Sequence " + str(index) + ": " + "(Length: " + str(length) + ")" + str(e)
         termcolor.cprint(string, color)
 
 

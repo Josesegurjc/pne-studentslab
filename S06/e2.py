@@ -27,13 +27,12 @@ class Seq:
     def len(self):
         return len(self.strbases)
 
+
 def print_seqs(list1):
     for e in list1:
         index = list1.index(e)
-        part1 = str(index) + ":"
         length = len(e.strbases)
-        part2 = "(Length:" + str(length) + ")"
-        print("Sequence", part1, part2, e)
+        print("Sequence " + str(index) + ":", "(Length: " + str(length) + ")", e)
 
 
 seq_list = [Seq("ACT"), Seq("GATA"), Seq("CAGATA")]
