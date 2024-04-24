@@ -32,7 +32,7 @@ def process_client(s):
     # Body (content to send)
 
     # This new contents are written in HTML language
-    infoA = Path("html/info/A.html").read_text()
+    infoa = Path("html/info/A.html").read_text()
 
     status_line = "HTTP/1.1 200 OK\n"
 
@@ -41,15 +41,12 @@ def process_client(s):
 
     # -- Build the message by joining together all the parts
     if request == "/info/A":
-        header += f"Content-Length: {len(infoA)}\n"
-        response_msg1 = status_line + header + "\n" + infoA
+        header += f"Content-Length: {len(infoa)}\n"
+        response_msg1 = status_line + header + "\n" + infoa
         cs.send(response_msg1.encode())
     else:
         response_msg1 = status_line + header + "\n"
         cs.send(response_msg1.encode())
-
-
-
 
 
 # -------------- MAIN PROGRAM

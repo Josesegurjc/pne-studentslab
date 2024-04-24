@@ -41,7 +41,7 @@ def process_client(s):
       </head>
       <body style="background-color: lightgreen;">
         <h1>GREEN SERVER</h1>
-        <p>I am the Green Server! :-)</p>
+        <p>I am the Green Server! :-) </p>
       </body>
     </html>
     """
@@ -55,10 +55,8 @@ def process_client(s):
     header += f"Content-Length: {len(body)}\n"
 
     # -- Build the message by joining together all the parts
-    response_msg1 = status_line + header + "\n" + body
+    response_msg1 = status_line + header + "\n" + Path("index.html").read_text()
     cs.send(response_msg1.encode())
-    response_msg2 = Path("index.html").read_text()
-    cs.send(response_msg2.encode())
 
 
 # -------------- MAIN PROGRAM

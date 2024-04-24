@@ -1,4 +1,5 @@
 import socket
+from termcolor import colored
 
 # Configure the Server's IP and PORT
 PORT = 8080
@@ -48,9 +49,9 @@ while True:
         msg = msg_raw.decode()
 
         info = client_ip_port
-        print("CONNECTION", i, "Client IP, PORT:", info)
+        print("CONNECTION", str(i) + ".", "Client IP, PORT:", info)
         # -- Print the received message
-        print(f"Message received: {msg}")
+        print(f"Message received: ", colored(msg, "green"))
         string = "ECHO: " + msg
         cs.send(string.encode())
 

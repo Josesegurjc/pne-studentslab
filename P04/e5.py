@@ -32,10 +32,10 @@ def process_client(s):
     # Body (content to send)
 
     # This new contents are written in HTML language
-    infoA = Path("html/info/A.html").read_text()
-    infoC = Path("html/info/C.html").read_text()
-    infoG = Path("html/info/G.html").read_text()
-    infoT = Path("html/info/T.html").read_text()
+    infoa = Path("html/info/A.html").read_text()
+    infoc = Path("html/info/C.html").read_text()
+    infog = Path("html/info/G.html").read_text()
+    infot = Path("html/info/T.html").read_text()
 
     status_line = "HTTP/1.1 200 OK\n"
 
@@ -44,28 +44,25 @@ def process_client(s):
 
     # -- Build the message by joining together all the parts
     if request == "/info/A":
-        header += f"Content-Length: {len(infoA)}\n"
-        response_msg1 = status_line + header + "\n" + infoA
+        header += f"Content-Length: {len(infoa)}\n"
+        response_msg1 = status_line + header + "\n" + infoa
         cs.send(response_msg1.encode())
     elif request == "/info/C":
-        header += f"Content-Length: {len(infoC)}\n"
-        response_msg1 = status_line + header + "\n" + infoC
+        header += f"Content-Length: {len(infoc)}\n"
+        response_msg1 = status_line + header + "\n" + infoc
         cs.send(response_msg1.encode())
     elif request == "/info/G":
-        header += f"Content-Length: {len(infoG)}\n"
-        response_msg1 = status_line + header + "\n" + infoG
+        header += f"Content-Length: {len(infog)}\n"
+        response_msg1 = status_line + header + "\n" + infog
         cs.send(response_msg1.encode())
     elif request == "/info/T":
-        header += f"Content-Length: {len(infoT)}\n"
-        response_msg1 = status_line + header + "\n" + infoT
+        header += f"Content-Length: {len(infot)}\n"
+        response_msg1 = status_line + header + "\n" + infot
         cs.send(response_msg1.encode())
     else:
         body = Path("html/error.html").read_text()
         response_msg1 = status_line + header + "\n" + body
         cs.send(response_msg1.encode())
-
-
-
 
 
 # -------------- MAIN PROGRAM

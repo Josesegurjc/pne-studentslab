@@ -25,6 +25,6 @@ print(c.talk(message))
 print("* Testing GENE...")
 list_of_genes = ["U5", "ADA", "FRAT1", "FXN", "RNU6_269P"]
 for gene in list_of_genes:
-    print("GENE", gene)
+    print("\n" + "GENE", gene)
     message = "GENE " + gene
     print(c.talk(message))

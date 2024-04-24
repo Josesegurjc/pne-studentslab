@@ -1,5 +1,6 @@
 from Seq1 import Seq
 import socket
+import termcolor
 
 # Configure the Server's IP and PORT
 PORT = 8080
@@ -52,17 +53,17 @@ while True:
 
         if msg.startswith("PING"):
             response = "OK!\n"
-            print("PING command!")
+            termcolor.cprint("PING command!", "green")
             print(response)
             cs.send(response.encode())
         elif msg.startswith("GET"):
-            print("GET")
+            termcolor.cprint("GET", "green")
             index = int(msg[msg.find(" "):])
             sequence = list_of_sequences[index]
             print(sequence)
             cs.send(sequence.encode())
         elif msg.startswith("INFO"):
-            print("INFO")
+            termcolor.cprint("INFO", "green")
             sequence = Seq(msg[msg.find(" ") + 1:])
             length = sequence.len(sequence.strbases)
             sequence1 = "Sequence: " + str(sequence)
@@ -79,19 +80,19 @@ while True:
                 cs.send(msg.encode())
 
         elif msg.startswith("COMP"):
-            print("COMP")
+            termcolor.cprint("COMP", "green")
             sequence = Seq(msg[msg.find(" ") + 1:])
             response = sequence.seq_complement(sequence.strbases)
             cs.send(response.encode())
             print(response)
         elif msg.startswith("REV"):
-            print("REV")
+            termcolor.cprint("REV", "green")
             sequence = Seq(msg[msg.find(" ") + 1:])
             response = sequence.seq_reverse(sequence.strbases)
             cs.send(response.encode())
             print(response)
         elif msg.startswith("GENE"):
-            print("GENE")
+            termcolor.cprint("GENE", "green")
             gene = Seq()
             filename = "Sequences/" + msg[msg.find(" ") + 1:]
             info = gene.seq_read_fasta(filename)
