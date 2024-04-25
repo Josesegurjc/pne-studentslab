@@ -1,6 +1,7 @@
 from Seq1 import Seq
 import http.client
 import json
+from termcolor import colored
 
 gene_name = input("Write the gene name:")
 list_of_genes = ["FRAT1", "ADA", "FXN", "RNU6_269P", "MIR633", "TTTY4C", "RBMY2YP", "FGFR3", "KDR", "ANK2"]
@@ -36,14 +37,11 @@ print(f"Response received!: {r1.status} {r1.reason}\n")
 # -- Read the response's body
 data1 = r1.read().decode("utf-8")
 response = json.loads(data1)
-print("Gene:", gene_name)
-print("Description:", response["desc"])
+print(colored("Gene:", "green"), gene_name)
+print(colored("Description:", "green"), response["desc"])
 bases = Seq(response["seq"])
-print("Total length:", bases.len(bases.strbases))
+print(colored("Total length:", "green"), bases.len(bases.strbases))
 bases_count = bases.seq_count(bases.strbases)
 for e in bases_count:
-    print(e + ":", bases_count[e], "(" + str(round((bases_count[e] / bases.len(bases.strbases)) * 100, 1)) + "%)")
-print("Most frequent base:", bases.most_common_base(bases.strbases))
-
-
-
+    print(colored(e + ":", "blue"), bases_count[e], "(" + str(round((bases_count[e] / bases.len(bases.strbases)) * 100, 1)) + "%)")
+print(colored("Most frequent base:", "green"), bases.most_common_base(bases.strbases))

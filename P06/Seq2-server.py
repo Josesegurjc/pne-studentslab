@@ -4,7 +4,29 @@ import termcolor
 from pathlib import Path
 import jinja2 as j
 from urllib.parse import parse_qs, urlparse
-from Seq0 import seq_reverse, seq_complement, seq_len, seq_count
+from Seq1 import Seq
+
+
+def read_html_file(filename):
+    contents = Path("html/" + filename).read_text()
+    contents = j.Template(contents)
+    return contents
+
+
+def get_info(seq):
+    sequence = Seq(seq)
+    text = "Sequence: " + seq + "<p>" + "Total length: " + str(sequence.len(sequence.strbases)) + "<p>"
+    dict1 = sequence.seq_count(sequence.strbases)
+    if sequence.len(sequence.strbases) != 0:
+        for key in dict1:
+            index = key + ": "
+            percentage = (dict1[key] / sequence.len(sequence.strbases)) * 100
+            percentage = "(" + str(round(percentage, 2)) + "%)"
+            text += "<p>" + index + str(dict1[key]) + percentage + "<p>"
+    else:
+        text = "ERROR"
+    return text
+
 
 # Define the Server's port
 PORT = 8080
@@ -27,21 +49,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
         # Open the form1.html file
         # Read the index from the file
-
-        def read_html_file(filename):
-            contents = Path("html/" + filename).read_text()
-            contents = j.Template(contents)
-            return contents
-
-        def get_info(sequence):
-            text = "Sequence: " + sequence + "<p>" + "Total length: " + str(seq_len(sequence)) + "<p>"
-            dict1 = seq_count(sequence)
-            for e in dict1:
-                index = e + ": "
-                percentage = (dict1[e] / seq_len(sequence)) * 100
-                percentage = "(" + str(round(percentage, 2)) + "%)"
-                text += "<p>" + index + str(dict1[e]) + percentage + "<p>"
-            return text
         url_path = urlparse(self.path)
         path = url_path.path  # we get it from here
         arguments = parse_qs(url_path.query)
@@ -62,27 +69,24 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             contents = Path("html/ping.html").read_text()
         elif path == "/get":
             number = arguments["s"][0]
-            text = list_of_sequences[int(number)]
-            contents = read_html_file("get.html").render(context={"todisplay": text})
+            text = "Sequence number " + number
+            text2 = list_of_sequences[int(number)]
+            contents = read_html_file("get.html").render(context={"todisplay": text, "todisplay2": text2})
         elif path == "/gene":
             key = arguments["g"][0]
             text = dict1[key]
             contents = read_html_file("gene.html").render(context={"todisplay": text})
         elif path == "/operation":
             key = arguments["op"][0]
+            text = arguments["operation"][0]
+            sequence = Seq(text)
             if key == "Info":
-                text = arguments["operation"][0]
-                text2 = "Info"
-                text3 = get_info(arguments["operation"][0])
+                text3 = get_info(text)
             elif key == "Comp":
-                text = arguments["operation"][0]
-                text2 = "Comp"
-                text3 = seq_complement(arguments["operation"][0])
+                text3 = sequence.seq_complement(sequence.strbases)
             else:
-                text = arguments["operation"][0]
-                text2 = "Rev"
-                text3 = seq_reverse(arguments["operation"][0], None)
-            contents = read_html_file("operation.html").render(context={"todisplay": text, "todisplay2": text2, "todisplay3": text3})
+                text3 = sequence.seq_reverse(sequence.strbases)
+            contents = read_html_file("operation.html").render(context={"todisplay": text, "todisplay2": key, "todisplay3": text3})
         else:
             contents = Path("html/error.html").read_text()
         # Generating the response message

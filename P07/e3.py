@@ -1,5 +1,6 @@
 import http.client
 import json
+from termcolor import colored
 
 SERVER = 'rest.ensembl.org'
 ENDPOINT = "/sequence/id/ENSG00000207552"
@@ -34,7 +35,6 @@ print(f"Response received!: {r1.status} {r1.reason}\n")
 # -- Read the response's body
 data1 = r1.read().decode("utf-8")
 response = json.loads(data1)
-print("Gene:", dict1[response["id"]])
-print("Description:", response["desc"])
-print("Bases:", response["seq"])
-
+print(colored("Gene:", "green"), dict1[response["id"]])
+print(colored("Description:", "green"), response["desc"])
+print(colored("Bases:", "green"), response["seq"])

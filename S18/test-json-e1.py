@@ -1,63 +1,37 @@
-
-import http.client
 import json
 import termcolor
+from pathlib import Path
 
-PORT = 8081
-SERVER = 'localhost'
+# -- Read the json file
+jsonstring = Path("people-e1.json").read_text()
 
-print(f"\nConnecting to server: {SERVER}:{PORT}\n")
-
-# Connect with the server
-conn = http.client.HTTPConnection(SERVER, PORT)
-
-# -- Send the request message, using the GET method. We are
-# -- requesting the main page (/)
-try:
-    conn.request("GET", "/listusers")
-except ConnectionRefusedError:
-    print("ERROR! Cannot connect to the Server")
-    exit()
-
-# -- Read the response message from the server
-r1 = conn.getresponse()
-
-# -- Print the status line
-print(f"Response received!: {r1.status} {r1.reason}\n")
-
-# -- Read the response's body
-data1 = r1.read().decode("utf-8")
-
-# -- Create a variable with the data,
-# -- form the JSON received
-person = json.loads(data1)
+# Create the object person from the json string
+person = json.loads(jsonstring)
 list_of_dicts = person["People"]
 
-print("CONTENT: ")
+print("Total people in the database: " + str(len(list_of_dicts)))
 
-# Print the information in the object
-for i in range(0, len(list_of_dicts)):
+# Print the information on the console, in colors
+for e in list_of_dicts:
     print()
-    user = list_of_dicts[i]
     termcolor.cprint("Name: ", 'green', end="")
-    print(user['Firstname'], user['Lastname'])
-
+    print(e['Firstname'], e['Lastname'])
     termcolor.cprint("Age: ", 'green', end="")
-    print(user['age'])
+    print(e['age'])
 
     # Get the phoneNumber list
-    phoneNumbers = user['phoneNumber']
+    phoneNumbers = e['phoneNumber']
 
-    # Print the number of elements int the list
+    # Print the number of elements in the list
     termcolor.cprint("Phone numbers: ", 'green', end='')
     print(len(phoneNumbers))
 
     # Print all the numbers
-    for i, num in enumerate(phoneNumbers):
-        termcolor.cprint("  Phone {}:".format(i), 'blue')
+    for i, dictnum in enumerate(phoneNumbers):
+        termcolor.cprint("  Phone " + str(i + 1) + ": ", 'blue')
 
         # The element num contains 2 fields: number and type
-        termcolor.cprint("    Type: ", 'red', end='')
-        print(num['type'])
-        termcolor.cprint("    Number: ", 'red', end='')
-        print(num['number'])
+        termcolor.cprint("\t- Type: ", 'red', end='')
+        print(dictnum['type'])
+        termcolor.cprint("\t- Number: ", 'red', end='')
+        print(dictnum['number'])

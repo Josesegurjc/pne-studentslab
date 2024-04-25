@@ -31,20 +31,19 @@ data1 = r1.read().decode("utf-8")
 # -- Create a variable with the data,
 # -- form the JSON received
 person = json.loads(data1)
-
+list_of_dicts = person["People"][0]
 
 print("CONTENT: ")
-
 # Print the information in the object
 print()
 termcolor.cprint("Name: ", 'green', end="")
-print(person['Firstname'], person['Lastname'])
+print(list_of_dicts['Firstname'], list_of_dicts['Lastname'])
 
 termcolor.cprint("Age: ", 'green', end="")
-print(person['age'])
+print(list_of_dicts['age'])
 
 # Get the phoneNumber list
-phoneNumbers = person['phoneNumber']
+phoneNumbers = list_of_dicts['phoneNumber']
 
 # Print the number of elements int the list
 termcolor.cprint("Phone numbers: ", 'green', end='')
