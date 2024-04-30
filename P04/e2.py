@@ -31,7 +31,7 @@ def process_client(s):
     # blank line
     # Body (content to send)
 
-    # This new contents are written in HTML language
+    # This new contents are written in html language
     infoa = Path("html/info/A.html").read_text()
 
     status_line = "HTTP/1.1 200 OK\n"
