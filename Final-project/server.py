@@ -6,6 +6,7 @@ from pathlib import Path
 import jinja2 as j
 from urllib.parse import parse_qs, urlparse
 import json
+from Seq1 import Seq
 
 
 
@@ -17,8 +18,8 @@ def read_html_file(filename):
 def get_ensembl_info(ENDPOINT):
     SERVER = 'rest.ensembl.org'
     PARAMS = "?content-type=application/json"
-    URL = SERVER + ENDPOINT + PARAMS
-
+    if ENDPOINT.find("?") != -1:
+        PARAMS = PARAMS[1:]
     # Connect with the server
     conn = http.client.HTTPConnection(SERVER)
 
@@ -84,7 +85,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 text3 += "<li>" + e["common_name"]
             text3 += "</ul>"
             contents = read_html_file("limit.html").render(context={"todisplay": text1, "todisplay2": text2, "todisplay3": text3})
-
         elif path == "/karyotype":
             species = arguments["species"][0]
             endpoint = "/info/assembly/" + species
@@ -112,6 +112,76 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 contents = read_html_file("chromosome_length.html").render(context={"todisplay": text1})
             else:
                 contents = Path("html/error.html").read_text()
+        elif path == "/geneSeq":
+            gene = arguments["gene"][0]
+            endpoint1 = "/xrefs/symbol/human/" + gene
+            id = get_ensembl_info(endpoint1)
+            if id[0] == 200:
+                endpoint2 = "/sequence/id/" + id[1][0]["id"]
+                response = get_ensembl_info(endpoint2)
+                sequence = response[1]["seq"]
+                sequence1 = ""
+                j = 0
+                for i in range(0, len(sequence), 50):
+                    sequence1 += "<p>" + sequence[j:i] + "</p>"
+                    j = i
+                contents = read_html_file("geneseq.html").render(context={"todisplay": sequence1})
+            else:
+                contents = Path("html/error.html").read_text()
+        elif path == "/geneInfo":
+            gene = arguments["gene"][0]
+            endpoint1 = "/xrefs/symbol/human/" + gene
+            response = get_ensembl_info(endpoint1)
+            if response[0] == 200:
+                id = response[1][0]["id"]
+                endpoint2 = "/sequence/id/" + id
+                response2 = get_ensembl_info(endpoint2)
+                sequence = response2[1]["seq"]
+                length = len(sequence)
+                chromosome = response2[1]["desc"].split(":")[2]
+                text = "<p>The gene starts with " + sequence[0] + "</p>"
+                text += "<p>The gene ends with " + sequence[-1] + "</p>"
+                text += "<p>The total length of the gene is " + str(length)
+                text += "<p> The id of the gene is " + id
+                text += "<p> This gene can be found in the chromosome " + chromosome + "</p>"
+                contents = read_html_file("genecalc.html").render(context={"todisplay": text})
+        elif path == "/geneCalc":
+            gene = arguments["gene"][0]
+            endpoint1 = "/xrefs/symbol/human/" + gene
+            id = get_ensembl_info(endpoint1)
+            if id[0] == 200:
+                endpoint2 = "/sequence/id/" + id[1][0]["id"]
+                response = get_ensembl_info(endpoint2)
+                sequence = Seq(response[1]["seq"])
+                length = sequence.len(sequence.strbases)
+                text = "<p>The total length of the gene is " + str(length) + "</p>"
+                bases_count = sequence.seq_count(sequence.strbases)
+                for e in bases_count:
+                    text += "<p>" + e + ":" + str(round(((bases_count[e] / length) * 100), 2)) + "%"
+                contents = read_html_file("genecalc.html").render(context={"todisplay": text})
+        elif path == "/geneList":
+            chromo = arguments["chromo"][0]
+            end = arguments["end"][0]
+            try:
+                start = arguments["start"][0]
+            except KeyError:
+                start = 0
+            start = 1000000
+            end = 2000000
+            endpoint = "/overlap/region/human/" + chromo + ":" + str(start) + "-" + str(end) + "?feature=gene;"
+            print(endpoint)
+            response = get_ensembl_info(endpoint)
+            if response[0] == 200:
+                text1 = "<ul>"
+                list_of_names = []
+                i = 0
+                for e in response[1]:
+                    if "external_name" in e.keys():
+                        list_of_names.append(e["external_name"])
+                for e in list_of_names:
+                    text1 += "<li>" + e
+                text1 += "</ul>"
+                contents = read_html_file("genelist.html").render(context={"todisplay": text1})
         else:
             contents = Path("html/error.html").read_text()
 
