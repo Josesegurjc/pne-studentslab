@@ -57,10 +57,10 @@ def get_karyotype(arguments):
     species = arguments["species"][0]
     endpoint = "/info/assembly/" + species
     response = get_ensembl_info(endpoint)
+    print(response)
+    list_of_chromosomes = []
     if response[0] == 200:
         list_of_chromosomes = response[1]["karyotype"]
-    else:
-        list_of_chromosomes = []
     return list_of_chromosomes
 
 
@@ -82,12 +82,11 @@ def get_gene_seq(arguments):
     gene = arguments["gene"][0]
     endpoint1 = "/xrefs/symbol/human/" + gene
     identification = get_ensembl_info(endpoint1)
-    if identification[0] == 200:
+    sequence = ""
+    if identification[1]:
         endpoint2 = "/sequence/id/" + identification[1][0]["id"]
         response = get_ensembl_info(endpoint2)
         sequence = response[1]["seq"]
-    else:
-        sequence = ""
     return sequence
 
 
@@ -95,7 +94,8 @@ def get_gene_info(arguments):
     gene = arguments["gene"][0]
     endpoint1 = "/xrefs/symbol/human/" + gene
     response = get_ensembl_info(endpoint1)
-    if response[0] == 200:
+    list1 = []
+    if response[1]:
         identification = response[1][0]["id"]
         endpoint2 = "/sequence/id/" + identification
         response2 = get_ensembl_info(endpoint2)
@@ -103,8 +103,6 @@ def get_gene_info(arguments):
         length = len(sequence)
         chromosome = response2[1]["desc"].split(":")[2]
         list1 = [chromosome, sequence, length, identification]
-    else:
-        list1 = []
     return list1
 
 
@@ -112,34 +110,33 @@ def get_gene_calc(arguments):
     gene = arguments["gene"][0]
     endpoint1 = "/xrefs/symbol/human/" + gene
     identification = get_ensembl_info(endpoint1)
-    if identification[0] == 200:
+    list1 = []
+    if identification[1]:
         endpoint2 = "/sequence/id/" + identification[1][0]["id"]
         response = get_ensembl_info(endpoint2)
         sequence = Seq(response[1]["seq"])
         length = sequence.len(sequence.strbases)
         bases_count = sequence.seq_count(sequence.strbases)
         list1 = [length, bases_count]
-    else:
-        list1 = []
     return list1
 
 
 def get_gene_list(arguments):
     chromo = arguments["chromo"][0]
     end = arguments["end"][0]
+    list_of_names = []
     try:
         start = arguments["start"][0]
     except KeyError:
         start = 0
     endpoint = "/overlap/region/human/" + chromo + ":" + str(start) + "-" + str(end) + "?feature=gene;"
     response = get_ensembl_info(endpoint)
+    list_of_names = []
     if response[0] == 200:
         list_of_names = []
         for e in response[1]:
             if "external_name" in e.keys():
                 list_of_names.append(e["external_name"])
-    else:
-        list_of_names = []
     return list_of_names
 
 
@@ -149,7 +146,7 @@ socketserver.TCPServer.allow_reuse_address = True
 
 
 class TestHandler(http.server.BaseHTTPRequestHandler):
-    def do_get(self):
+    def do_GET(self):
 
         termcolor.cprint(self.requestline, 'green')
         url_path = urlparse(self.path)
@@ -157,12 +154,14 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         arguments = parse_qs(url_path.query)
         content_type = "text/html"
         json_condition = False
-        contents = ""
+        # Handle other endpoints or return an error page/message
+        contents = Path("html/error.html").read_text()
 
         if "json" in arguments.keys():
             if arguments["json"][0] == "1":
                 content_type = "application/json"
                 json_condition = True
+                response = {"Error": "Path not recognized"}
         if path == "/":
             if json_condition:
                 response = {"message": "Welcome to the server"}
@@ -173,7 +172,10 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             list_of_species, limit = get_list_species(arguments)
             if not json_condition:
                 text1 = "The total number of species in the ensembl is: " + str(len(list_of_species))
-                text2 = "The limit you have selected is: " + limit
+                if len(list_of_species) < int(limit):
+                    text2 = "The limit chosen is higher than the total amount of species, then all species are shown"
+                else:
+                    text2 = "The limit you have selected is: " + limit
                 text3 = "<ul>"
                 for species in list_of_species[0: int(limit)]:
                     text3 += "<li>" + species["common_name"]
@@ -185,29 +187,28 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     "limit": int(limit),
                     "species": [sp['common_name'] for sp in list_of_species[:int(limit)]]
                 }
-                contents = json.dumps(response)
         elif path == "/karyotype":
             list_of_chromosomes = get_karyotype(arguments)
-            if list_of_chromosomes != [] and not json_condition:
-                text1 = "<ul>"
-                for e in list_of_chromosomes:
-                    text1 += "<li>" + e
-                text1 += "</ul>"
-                contents = read_html_file("karyotype.html").render(context={"todisplay": text1})
-            elif json_condition:
-                response = {"karyotype": list_of_chromosomes}
-                contents = json.dumps(response)
+            if list_of_chromosomes:
+                if not json_condition:
+                    text1 = "The name of the chromosomes are:"
+                    text2 = "<ul>"
+                    for e in list_of_chromosomes:
+                        text2 += "<li>" + e
+                    text2 += "</ul>"
+                    contents = read_html_file("karyotype.html").render(context={"todisplay": text1, "todisplay2": text2})
+                elif json_condition:
+                    response = {"karyotype": list_of_chromosomes}
         elif path == "/chromosomeLength":
             length = get_chromosome_length(arguments)
-            if length != "":
+            if length:
                 if not json_condition:
                     contents = read_html_file("chromosome_length.html").render(context={"todisplay": length})
                 else:
                     response = {"Chromosome Length": length}
-                    contents = json.dumps(response)
         elif path == "/geneSeq":
             sequence = get_gene_seq(arguments)
-            if sequence != "":
+            if sequence:
                 if not json_condition:
                     sequence1 = ""
                     k = 0
@@ -217,7 +218,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     contents = read_html_file("geneseq.html").render(context={"todisplay": sequence1})
                 else:
                     response = {"Sequence": sequence}
-                    contents = json.dumps(response)
         elif path == "/geneInfo":
             list1 = get_gene_info(arguments)
             if list1:
@@ -240,7 +240,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                         "ID": identification,
                         "Chromosome": chromosome
                     }
-                    contents = json.dumps(response)
         elif path == "/geneCalc":
             list1 = get_gene_calc(arguments)
             if list1:
@@ -259,42 +258,39 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                         "C": (str(round(((bases_count["C"] / length) * 100), 2)) + "%"),
                         "G": (str(round(((bases_count["G"] / length) * 100), 2)) + "%"),
                     }
-                    contents = json.dumps(response)
         elif path == "/geneList":
             list_of_names = get_gene_list(arguments)
-            if not json_condition:
-                if list_of_names:
-                    text1 = "<ul>"
-                    for e in list_of_names:
-                        text1 += "<li>" + e
-                    text1 += "</ul>"
+            if list_of_names:
+                if not json_condition:
+                    if list_of_names:
+                        text1 = "<ul>"
+                        for e in list_of_names:
+                            text1 += "<li>" + e
+                        text1 += "</ul>"
+                    else:
+                        text1 = "There are no genes in the chosen limits"
+                    contents = read_html_file("genelist.html").render(context={"todisplay": text1})
                 else:
-                    text1 = "There are no genes in the chosen limits"
-                contents = read_html_file("genelist.html").render(context={"todisplay": text1})
-            else:
-                if list_of_names:
-                    response = {"List": list_of_names}
-                else:
-                    response = {"List": "There are no genes in the chosen limits"}
-                contents = json.dumps(response)
-        else:
-            # Handle other endpoints or return an error page/message
-            if not json_condition:
-                contents = Path("html/error.html").read_text()
-            else:
-                response = {"Error": "Path not recognized"}
-                contents = json.dumps(response)
+                    if list_of_names:
+                        response = {"List": list_of_names}
+                    else:
+                        response = {"List": " "}
+
+        if json_condition:
+            contents = json.dumps(response)
 
         self.send_response(200)
         self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(contents)))
         self.end_headers()
-        self.wfile.write(contents.encode())
+        self.wfile.write(str.encode(contents))
+
+        return
 
 
 # Setup and run the server as before
 Handler = TestHandler
-PORT = 8091
+PORT = 8090
 
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
 
