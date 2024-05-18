@@ -20,24 +20,14 @@ def get_ensembl_info(endpoint):
     params = "?content-type=application/json"
     if endpoint.find("?") != -1:
         params = params[1:]
-    # Connect with the server
     conn = http.client.HTTPConnection(server)
-
-    # -- Send the request message, using the GET method. We are
-    # -- requesting the main page (/)
     try:
         conn.request("GET", endpoint + params)
     except ConnectionRefusedError:
         print("ERROR! Cannot connect to the Server")
         exit()
-
-    # -- Read the response message from the server
     r1 = conn.getresponse()
-
-    # -- Print the status line
     print(f"Response received!: {r1.status} {r1.reason}\n")
-
-    # -- Read the response's body
     data1 = r1.read().decode("utf-8")
     response = list((r1.status, json.loads(data1)))
     return response
@@ -57,7 +47,6 @@ def get_karyotype(arguments):
     species = arguments["species"][0]
     endpoint = "/info/assembly/" + species
     response = get_ensembl_info(endpoint)
-    print(response)
     list_of_chromosomes = []
     if response[0] == 200:
         list_of_chromosomes = response[1]["karyotype"]
@@ -131,7 +120,6 @@ def get_gene_list(arguments):
         start = 0
     endpoint = "/overlap/region/human/" + chromo + ":" + str(start) + "-" + str(end) + "?feature=gene;"
     response = get_ensembl_info(endpoint)
-    list_of_names = []
     if response[0] == 200:
         list_of_names = []
         for e in response[1]:
@@ -140,21 +128,17 @@ def get_gene_list(arguments):
     return list_of_names
 
 
-# Assuming other functions and imports remain unchanged
-# -- This is for preventing the error: "Port already in use"
 socketserver.TCPServer.allow_reuse_address = True
 
 
 class TestHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
-
         termcolor.cprint(self.requestline, 'green')
         url_path = urlparse(self.path)
         path = url_path.path
         arguments = parse_qs(url_path.query)
         content_type = "text/html"
         json_condition = False
-        # Handle other endpoints or return an error page/message
         contents = Path("html/error.html").read_text()
 
         if "json" in arguments.keys():
@@ -170,23 +154,28 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 contents = Path("html/index.html").read_text()
         elif path == "/listSpecies":
             list_of_species, limit = get_list_species(arguments)
-            if not json_condition:
-                text1 = "The total number of species in the ensembl is: " + str(len(list_of_species))
-                if len(list_of_species) < int(limit):
-                    text2 = "The limit chosen is higher than the total amount of species, then all species are shown"
-                else:
-                    text2 = "The limit you have selected is: " + limit
-                text3 = "<ul>"
-                for species in list_of_species[0: int(limit)]:
-                    text3 += "<li>" + species["common_name"]
-                text3 += "</ul>"
-                contents = read_html_file("limit.html").render(context={"todisplay": text1, "todisplay2": text2, "todisplay3": text3})
-            else:
-                response = {
-                    "total_species": len(list_of_species),
-                    "limit": int(limit),
-                    "species": [sp['common_name'] for sp in list_of_species[:int(limit)]]
-                }
+            if limit.isdigit():
+                if int(limit) >= 0:
+                    if not json_condition:
+                        text1 = "The total number of species in the ensembl is: " + str(len(list_of_species))
+                        if len(list_of_species) < int(limit):
+                            text2 = "The limit chosen is higher than the total amount of species, then all species are shown"
+                        else:
+                            text2 = "The limit you have selected is: " + limit
+                        text3 = "<ul>"
+                        for species in list_of_species[0: int(limit)]:
+                            text3 += "<li>" + species["common_name"]
+                        text3 += "</ul>"
+                        contents = read_html_file("limit.html").render(context={"todisplay": text1, "todisplay2": text2, "todisplay3": text3})
+                    else:
+                        list_of_names = []
+                        for species in list_of_species[:int(limit)]:
+                            list_of_names.append(species["common_name"])
+                        response = {
+                            "total_species": len(list_of_species),
+                            "limit": int(limit),
+                            "species": list_of_names
+                        }
         elif path == "/karyotype":
             list_of_chromosomes = get_karyotype(arguments)
             if list_of_chromosomes:
@@ -288,16 +277,14 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         return
 
 
-# Setup and run the server as before
+# Setup and run the server
 Handler = TestHandler
-PORT = 8090
+PORT = 8091
 
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
 
     print("Serving at PORT", PORT)
 
-    # -- Main loop: Attend the client. Whenever there is a new
-    # -- clint, the handler is called
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
